@@ -41,7 +41,7 @@ void main() {
   // радужная кромка на краях во время перехода
   float edge = smoothstep(.0, .06, min(min(uv.x, 1. - uv.x), min(uv.y, 1. - uv.y)));
   vec3 rainbow = .5 + .5 * cos(6.2831 * (uv.y * .8 + uT + vec3(0., .33, .67)));
-  col = mix(col, rainbow, (1. - edge) * k * .4);
+  col = mix(col, rainbow, (1. - edge) * k * 0.); // радужную кромку убрали — остаётся только цветное расслоение, как в оригинале
   float mask = box(uv);
   gl_FragColor = vec4(col * mask, mask * max(al, .0));
 }`;

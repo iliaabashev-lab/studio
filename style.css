@@ -26,7 +26,7 @@ main > section { padding: 120px var(--gr) 0 var(--gl); max-width: 1360px; margin
 .btn { display: inline-flex; align-items: center; min-height: 52px; padding: 0 26px; border-radius: 999px; font: 500 16px var(--f); text-decoration: none; border: 1px solid transparent; cursor: pointer; transition: background .3s, color .3s, transform .2s, border-color .3s; }
 .btn--main { background: var(--ink); color: var(--on-ink); }
 .btn--line { border-color: var(--ink); }
-@media (hover: hover) { .btn--main:hover { background: var(--rainbow); color: var(--ink); } .btn--line:hover { background: var(--ink); color: var(--on-ink); } }
+@media (hover: hover) { .btn--main:hover { background: #22324D; color: var(--on-ink); } .btn--line:hover { background: var(--ink); color: var(--on-ink); } }
 .btn:active { transform: scale(.98); }
 
 /* прелоадер */
@@ -34,10 +34,10 @@ main > section { padding: 120px var(--gr) 0 var(--gl); max-width: 1360px; margin
 html.js .pre.is-on { display: block; }
 .pre__name { position: absolute; left: var(--gl); top: 28px; font: 500 14px var(--mono); opacity: .6; }
 .pre__num { position: absolute; right: var(--gr); bottom: 6px; font: 700 clamp(110px, 24vw, 340px)/.8 var(--f); letter-spacing: -.07em; font-variant-numeric: tabular-nums;
-  background: var(--rainbow); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  color: var(--on-ink); }
 
 /* радужная шторка */
-.wipe { position: fixed; inset: 0; z-index: 90; background: var(--rainbow); transform: translateY(101%); pointer-events: none; }
+.wipe { position: fixed; inset: 0; z-index: 90; background: var(--ink); transform: translateY(101%); pointer-events: none; }
 .wipe.is-cover { transform: none; }
 
 /* шапка */
@@ -98,7 +98,7 @@ html.js .pre.is-on { display: block; }
 .acc__go { align-self: flex-start; }
 .acc__item.is-open .acc__body { grid-template-rows: 1fr; }
 .acc__item.is-open .acc__t { transform: translateX(10px); }
-.acc__item.is-open .acc__n { background: linear-gradient(90deg, hsl(var(--h, 30) 85% 50%), hsl(calc(var(--h, 30) + 80) 85% 50%)); -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: 500; }
+.acc__item.is-open .acc__n { color: var(--ink); font-weight: 500; }
 
 /* телефон */
 .phone-sec { display: grid; grid-template-columns: 1fr auto; gap: 60px; align-items: center; }
@@ -196,7 +196,7 @@ body { animation: page-in .5s ease both; }
 body.is-leaving { opacity: 0; transition: opacity .3s ease; }
 
 /* карточка работ */
-.dial { position: relative; height: 420vh; max-width: none !important; padding-left: 0 !important; padding-right: 0 !important; }
+.dial { position: relative; height: 330vh; max-width: none !important; padding-left: 0 !important; padding-right: 0 !important; }
 .dial__sticky { position: sticky; top: 0; height: 100svh; display: grid; grid-template-rows: auto 1fr auto auto; gap: 14px;
   padding: 84px var(--gr) 26px var(--gl); max-width: 1360px; margin: 0 auto; }
 .dial__top { display: flex; justify-content: space-between; align-items: baseline; }
@@ -212,5 +212,5 @@ body.is-leaving { opacity: 0; transition: opacity .3s ease; }
 .dial__names { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
 .dial__names button { border: 0; background: none; padding: 6px 10px; border-radius: 999px; font: 400 13px var(--mono); color: var(--muted); cursor: pointer; }
 .dial__names button.is-on { background: var(--ink); color: var(--on-ink); }
-@media (max-width: 900px) { .dial { height: 360vh; } .dial__stage canvas { width: 100%; } }
+@media (max-width: 900px) { .dial { height: 290vh; } .dial__stage canvas { width: 100%; } }
 @media (prefers-reduced-motion: reduce) { .dial { height: auto; } .dial__sticky { position: static; height: auto; } }

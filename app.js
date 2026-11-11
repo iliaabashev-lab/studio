@@ -1,5 +1,5 @@
-import { WORKS, STUDIO } from './data.js?v=3';
-import { mountDial } from './dial.js?v=4';
+import { WORKS, STUDIO } from './data.js?v=5';
+import { mountDial } from './dial.js?v=5';
 
 const gsap = window.gsap;
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -97,7 +97,7 @@ if (!isCase) {
         const x = p.px + (p.x - p.px) * (i / steps), y = p.py + (p.y - p.py) * (i / steps);
         const hue = (t * 40 + x * 0.15) % 360, r = Math.min(w, h) * 0.12;
         const grd = g.createRadialGradient(x, y, 0, x, y, r);
-        grd.addColorStop(0, `hsla(${hue}, 85%, 60%, 0.12)`); grd.addColorStop(1, `hsla(${hue}, 85%, 60%, 0)`);
+        grd.addColorStop(0, `hsla(${212 + 14 * Math.sin(hue / 57)}, 45%, 56%, 0.10)`); grd.addColorStop(1, `hsla(212, 45%, 56%, 0)`); // спокойный холодный синий, без радуги
         g.fillStyle = grd; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
       }
       p.px = p.x; p.py = p.y;
@@ -107,7 +107,7 @@ if (!isCase) {
 
   /* ---------- карточка работ: прокрутка листает кадры ---------- */
   const SL = [
-    { img: './img/tehnika.jpg', id: 'tehnika' }, { img: './img/tehnika-xray.jpg', id: 'tehnika', note: 'разборка на прокрутке' },
+    { img: './img/tehnika.jpg', id: 'tehnika' },
     { img: './img/gipu.jpg', id: 'gipu' }, { img: './img/rkompas.jpg', id: 'rkompas' },
   ].map((x) => ({ ...x, w: WORKS.find((w) => w.id === x.id) }));
   const dialRoot = $('.dial');
