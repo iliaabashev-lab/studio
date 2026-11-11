@@ -1,5 +1,5 @@
-import { WORKS, STUDIO } from './data.js?v=5';
-import { mountDial } from './dial.js?v=5';
+import { WORKS, STUDIO } from './data.js?v=7';
+import { mountDial } from './dial.js?v=7';
 
 const gsap = window.gsap;
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -44,6 +44,74 @@ if (menuBtn && menu) {
 /* ---------- контакты ---------- */
 $$('[data-phone]').forEach((el) => { el.textContent = STUDIO.phone; });
 
+/* ---------- синее пятно за курсором: на всю страницу, позади текста ---------- */
+if (!reduced) {
+  const cv = document.createElement('canvas'); cv.className = 'fluid'; cv.setAttribute('aria-hidden', 'true');
+  document.body.prepend(cv);
+  const g = cv.getContext('2d');
+  let w = 0, h = 0; const q = 0.5 * Math.min(devicePixelRatio || 1, 1.5); // считаем в половинном разрешении: всё равно размыто
+  const size = () => { w = innerWidth; h = innerHeight; cv.width = Math.round(w * q); cv.height = Math.round(h * q); g.setTransform(q, 0, 0, q, 0, 0); };
+  size(); addEventListener('resize', size);
+  const p = { x: w * 0.7, y: h * 0.4, px: w * 0.7, py: h * 0.4, active: 0 };
+  addEventListener('pointermove', (e) => { p.x = e.clientX; p.y = e.clientY; p.active = 1; }, { passive: true });
+  let t = 0;
+  const loop = () => {
+    requestAnimationFrame(loop);
+    if (document.hidden) return;
+    t += 0.016;
+    if (p.active < 0.02) { p.x = w * (0.62 + 0.22 * Math.sin(t * 0.7)); p.y = h * (0.42 + 0.2 * Math.sin(t * 1.1)); } // пока мышь стоит, пятно медленно плавает само
+    p.active *= 0.985;
+    g.globalCompositeOperation = 'destination-out'; // след гаснет до прозрачного, фон страницы не перекрашивается
+    g.fillStyle = 'rgba(0,0,0,0.06)'; g.fillRect(0, 0, w, h);
+    g.globalCompositeOperation = 'source-over';
+    const steps = Math.max(1, Math.min(12, Math.hypot(p.x - p.px, p.y - p.py) / 8));
+    for (let i = 0; i < steps; i++) {
+      const x = p.px + (p.x - p.px) * (i / steps), y = p.py + (p.y - p.py) * (i / steps);
+      const hue = 212 + 14 * Math.sin((t * 40 + x * 0.15) / 57), r = Math.min(w, h) * 0.12;
+      const grd = g.createRadialGradient(x, y, 0, x, y, r);
+      grd.addColorStop(0, `hsla(${hue}, 45%, 56%, 0.10)`); grd.addColorStop(1, 'hsla(212, 45%, 56%, 0)');
+      g.fillStyle = grd; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
+    }
+    p.px = p.x; p.py = p.y;
+  };
+  loop();
+}
+
+/* ---------- свой курсор: точка + кольцо с запаздыванием; над ссылками кольцо растёт,
+   над работами и карточкой появляется подпись. Инверсия цвета — виден и на светлом, и на тёмном ---------- */
+if (fine) {
+  const cur = document.createElement('div'); cur.className = 'cur'; cur.setAttribute('aria-hidden', 'true');
+  cur.innerHTML = '<i class="cur__ring"><span class="cur__label"></span></i><i class="cur__dot"></i>';
+  document.body.append(cur);
+  document.documentElement.classList.add('has-cur');
+  const ring = $('.cur__ring', cur), dot = $('.cur__dot', cur), label = $('.cur__label', cur);
+  const m = { x: -100, y: -100 }, r = { x: -100, y: -100 };
+  addEventListener('pointermove', (e) => {
+    m.x = e.clientX; m.y = e.clientY; cur.classList.add('is-on');
+    if (reduced) { r.x = m.x; r.y = m.y; }
+  }, { passive: true });
+  document.addEventListener('mouseout', (e) => { if (!e.relatedTarget) cur.classList.remove('is-on', 'is-down'); }); // ушёл с окна или в iframe с живым сайтом
+  addEventListener('pointerdown', () => cur.classList.add('is-down'));
+  const up = () => cur.classList.remove('is-down');
+  ['pointerup', 'pointercancel', 'blur', 'dragend'].forEach((n) => addEventListener(n, up));
+  const LABELS = [['.dial__stage canvas', 'Тянуть'], ['.acc__head', 'Кейс'], ['.acc__shot, .dial__fallback', 'Кейс']];
+  document.addEventListener('pointerover', (e) => {
+    const el = e.target;
+    const hit = LABELS.find(([sel]) => el.closest(sel));
+    const link = el.closest('a, button, [role="tab"], label');
+    cur.classList.toggle('is-label', !!hit);
+    cur.classList.toggle('is-link', !hit && !!link);
+    if (hit) label.textContent = hit[1];
+  });
+  const loop = () => {
+    requestAnimationFrame(loop);
+    r.x += (m.x - r.x) * 0.18; r.y += (m.y - r.y) * 0.18;
+    dot.style.transform = `translate3d(${m.x}px, ${m.y}px, 0)`;
+    ring.style.transform = `translate3d(${r.x}px, ${r.y}px, 0)`;
+  };
+  loop();
+}
+
 if (!isCase) {
   /* ---------- прелоадер: счётчик 0→100, потом панель уезжает вверх (один раз за визит) ---------- */
   const pre = $('.pre');
@@ -70,39 +138,6 @@ if (!isCase) {
       const t = setInterval(() => { div.textContent = text.slice(0, ++k); if (k >= text.length) { clearInterval(t); div.classList.add('is-ok'); setTimeout(next, 220); } }, 22);
     };
     next();
-  }
-
-  /* ---------- «жидкость» за курсором: радужные пятна с затуханием, размытые фильтром ---------- */
-  const cv = $('.fluid');
-  if (cv && !reduced) {
-    const g = cv.getContext('2d');
-    let w = 0, h = 0, dpr = Math.min(devicePixelRatio || 1, 1.5);
-    const size = () => { w = cv.clientWidth; h = cv.clientHeight; cv.width = w * dpr / 2; cv.height = h * dpr / 2; g.setTransform(dpr / 2, 0, 0, dpr / 2, 0, 0); };
-    size(); addEventListener('resize', size);
-    const p = { x: w * 0.7, y: h * 0.4, px: w * 0.7, py: h * 0.4, active: 0 };
-    const move = (x, y) => { const r = cv.getBoundingClientRect(); p.x = x - r.left; p.y = y - r.top; p.active = 1; };
-    addEventListener('pointermove', (e) => move(e.clientX, e.clientY), { passive: true });
-    let t = 0, visible = true;
-    new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(cv);
-    const loop = () => {
-      requestAnimationFrame(loop);
-      if (!visible) return;
-      t += 0.016;
-      if (p.active < 0.02) { p.x = w * (0.62 + 0.22 * Math.sin(t * 0.7)); p.y = h * (0.42 + 0.2 * Math.sin(t * 1.1)); } // сам «дышит», пока мышь не двигается
-      p.active *= 0.985;
-      g.globalCompositeOperation = 'source-over';
-      g.fillStyle = 'rgba(232,235,238,0.06)'; g.fillRect(0, 0, w, h);
-      const steps = Math.max(1, Math.min(12, Math.hypot(p.x - p.px, p.y - p.py) / 8));
-      for (let i = 0; i < steps; i++) {
-        const x = p.px + (p.x - p.px) * (i / steps), y = p.py + (p.y - p.py) * (i / steps);
-        const hue = (t * 40 + x * 0.15) % 360, r = Math.min(w, h) * 0.12;
-        const grd = g.createRadialGradient(x, y, 0, x, y, r);
-        grd.addColorStop(0, `hsla(${212 + 14 * Math.sin(hue / 57)}, 45%, 56%, 0.10)`); grd.addColorStop(1, `hsla(212, 45%, 56%, 0)`); // спокойный холодный синий, без радуги
-        g.fillStyle = grd; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
-      }
-      p.px = p.x; p.py = p.y;
-    };
-    loop();
   }
 
   /* ---------- карточка работ: прокрутка листает кадры ---------- */

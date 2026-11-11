@@ -69,7 +69,7 @@ html.js .pre.is-on { display: block; }
 
 /* первый экран */
 .hero { position: relative; min-height: 100svh; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 64px; padding-top: 120px; max-width: none !important; overflow: hidden; }
-.fluid { position: absolute; inset: 0; width: 100%; height: 100%; filter: blur(34px) saturate(1.25); opacity: .9; pointer-events: none; }
+.fluid { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: -1; filter: blur(34px) saturate(1.25); opacity: .9; pointer-events: none; }
 .hero > *:not(.fluid) { position: relative; max-width: 1360px; width: 100%; margin-left: auto; margin-right: auto; }
 .term { font: 400 14px/1.75 var(--mono); color: var(--muted); margin-bottom: 28px; min-height: 7em; }
 .term__line::before { content: "› "; color: #1f9d63; }
@@ -214,3 +214,21 @@ body.is-leaving { opacity: 0; transition: opacity .3s ease; }
 .dial__names button.is-on { background: var(--ink); color: var(--on-ink); }
 @media (max-width: 900px) { .dial { height: 290vh; } .dial__stage canvas { width: 100%; } }
 @media (prefers-reduced-motion: reduce) { .dial { height: auto; } .dial__sticky { position: static; height: auto; } }
+
+/* свой курсор: точка ходит за мышью сразу, кольцо догоняет; цвет инвертируется по фону */
+html.has-cur, html.has-cur * { cursor: none !important; }
+.cur { position: fixed; inset: 0; z-index: 200; pointer-events: none; mix-blend-mode: difference; opacity: 0; transition: opacity .25s; }
+.cur.is-on { opacity: 1; }
+.cur__dot, .cur__ring { position: absolute; left: 0; top: 0; will-change: transform; }
+.cur__dot::before { content: ""; position: absolute; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: #fff; transition: transform .25s; }
+.cur__ring::before { content: ""; position: absolute; width: 34px; height: 34px; margin: -17px 0 0 -17px; border-radius: 50%; border: 1px solid #fff;
+  transition: width .35s cubic-bezier(.2,.8,.2,1), height .35s cubic-bezier(.2,.8,.2,1), margin .35s cubic-bezier(.2,.8,.2,1), background .3s, border-color .3s; }
+.cur__label { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%) scale(.6); opacity: 0; color: #000; white-space: nowrap;
+  font: 500 12px var(--mono); letter-spacing: .04em; text-transform: uppercase; transition: opacity .25s, transform .35s cubic-bezier(.2,.8,.2,1); }
+.cur.is-link .cur__ring::before { width: 64px; height: 64px; margin: -32px 0 0 -32px; background: rgba(255,255,255,.12); }
+.cur.is-link .cur__dot::before { transform: scale(0); }
+.cur.is-label .cur__ring::before { width: 92px; height: 92px; margin: -46px 0 0 -46px; background: #fff; }
+.cur.is-label .cur__label { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+.cur.is-label .cur__dot::before { transform: scale(0); }
+.cur.is-down .cur__ring::before { width: 26px; height: 26px; margin: -13px 0 0 -13px; }
+.cur.is-down.is-label .cur__ring::before { width: 80px; height: 80px; margin: -40px 0 0 -40px; }
