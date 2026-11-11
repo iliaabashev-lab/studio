@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ru" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Прототип — сайты для малого бизнеса</title>
+  <meta name="description" content="Делаем сайты для малого бизнеса: сначала показываем готовый прототип на вашем телефоне, оплата только после проверки.">
+  <meta name="theme-color" content="#151717">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap">
+  <link rel="stylesheet" href="./style.css">
+  <script>document.documentElement.classList.replace('no-js','js')</script>
+</head>
+<body>
+  <!-- прелоадер (по aller.studio): большой счётчик 0→100 и название, панель уезжает вверх -->
+  <div class="pre" aria-hidden="true"><span class="pre__name">Прототип</span><span class="pre__num">000</span></div>
+  <!-- радужная шторка для переходов (по adamperlis.com) -->
+  <div class="wipe" aria-hidden="true"></div>
+
+  <header class="top">
+    <a class="logo" href="./">Прототип<sup>студия</sup></a>
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu"><span class="menu-btn__dot"></span><span class="menu-btn__dot"></span><span class="menu-btn__label">Меню</span></button>
+  </header>
+
+  <!-- журнальное меню (по brandonyasin.com) -->
+  <nav class="menu" id="menu" aria-label="Разделы">
+    <ol class="menu__list">
+      <li><a href="#raboty" data-hint="6 демо и концептов"><span class="menu__n">01</span><span class="menu__t">Работы</span></a></li>
+      <li><a href="#telefon" data-hint="как это выглядит в руке"><span class="menu__n">02</span><span class="menu__t">С телефона</span></a></li>
+      <li><a href="#ceny" data-hint="два тарифа, без предоплаты"><span class="menu__n">03</span><span class="menu__t">Цены</span></a></li>
+      <li><a href="#kak" data-hint="от прототипа до домена"><span class="menu__n">04</span><span class="menu__t">Как работаем</span></a></li>
+      <li><a href="#svyaz" data-hint="Telegram или MAX"><span class="menu__n">05</span><span class="menu__t">Связаться</span></a></li>
+    </ol>
+    <p class="menu__foot">Работаем как ИП, по договору. Оплата на расчётный счёт после проверки сайта.</p>
+  </nav>
+
+  <main>
+    <section class="hero" aria-labelledby="h1">
+      <canvas class="fluid" aria-hidden="true"></canvas>
+      <!-- интро-терминал (по adamperlis.com) -->
+      <div class="term" aria-hidden="true"><div class="term__body"></div></div>
+      <h1 id="h1" class="hero__title">Сначала покажем ваш сайт.<br><em>Платите, когда понравится.</em></h1>
+      <p class="hero__lede">Собираем сайт под ваш бизнес за 2–3 дня и присылаем ссылку. Смотрите с телефона, жмёте кнопки, правим. Оплата только после проверки.</p>
+      <div class="hero__row"><a class="btn btn--main" href="#svyaz">Хочу прототип</a><a class="btn btn--line" href="#raboty">Смотреть работы</a></div>
+    </section>
+
+    <!-- сетка-аккордеон работ (по signal-a.studio) -->
+    <section class="works" id="raboty" aria-labelledby="works-t">
+      <div class="sec-head"><h2 id="works-t">Работы</h2><p>Демо по нишам и концепты. Наведите на строку, нажмите, чтобы открыть кейс.</p></div>
+      <ol class="acc"></ol>
+    </section>
+
+    <!-- с телефона (по arshawnarbabi.com) -->
+    <section class="phone-sec" id="telefon" aria-labelledby="phone-t">
+      <div class="phone-sec__text">
+        <h2 id="phone-t">Так ваш клиент увидит сайт</h2>
+        <p>Большинство клиентов заходят с телефона, поэтому каждый наш сайт сначала собирается под палец, потом под мышку. Это живые демо, их можно листать прямо здесь.</p>
+        <div class="phone-tabs" role="tablist" aria-label="Демо"></div>
+      </div>
+      <div class="phone"><div class="phone__screen"><iframe title="Демо сайта на телефоне" loading="lazy"></iframe></div><span class="phone__island"></span></div>
+    </section>
+
+    <section class="prices" id="ceny" aria-labelledby="prices-t">
+      <div class="sec-head"><h2 id="prices-t">Цены</h2><p>Без предоплаты. Домен и хостинг оформляются на вас, мы помогаем по шагам.</p></div>
+      <div class="plans">
+        <article class="plan"><h3>Старт</h3><p class="plan__price">8 990 ₽</p><ul><li>Одна страница: услуги, цены, фото работ</li><li>Кнопки звонка, Telegram и MAX</li><li>Заявки приходят в Telegram</li><li>Карта и контакты</li><li>1 круг правок, 3 дня</li></ul></article>
+        <article class="plan plan--main"><h3>Бизнес</h3><p class="plan__price">14 990 ₽</p><ul><li>Всё из «Старта»</li><li>Калькулятор стоимости</li><li>Отзывы из 2ГИС и Яндекса</li><li>Этапы, гарантии, вопросы-ответы</li><li>Фирменный цвет и анимация</li><li>2 круга правок, 2 дня</li></ul></article>
+        <article class="plan"><h3>Старт в Яндексе и 2ГИС</h3><p class="plan__price">1 500 ₽</p><ul><li>Сайт в Яндекс Вебмастере</li><li>Счётчик звонков и заявок</li><li>Ссылка и кнопки в карточках Яндекс Карт и 2ГИС</li></ul></article>
+      </div>
+    </section>
+
+    <section class="how" id="kak" aria-labelledby="how-t">
+      <div class="sec-head"><h2 id="how-t">Как работаем</h2></div>
+      <ol class="steps">
+        <li><b>Прототип</b><span>Собираем сайт под ваш бизнес по фото и отзывам из 2ГИС. Бесплатно.</span></li>
+        <li><b>Проверка</b><span>Открываете ссылку с телефона, жмёте кнопки, говорите, что поправить.</span></li>
+        <li><b>Оплата</b><span>Договор с ИП, оплата на расчётный счёт, только когда всё устраивает.</span></li>
+        <li><b>Запуск</b><span>Переносим на ваш домен, подключаем заявки в Telegram, отдаём доступы.</span></li>
+      </ol>
+    </section>
+
+    <section class="contact" id="svyaz" aria-labelledby="c-t">
+      <h2 id="c-t">Пришлите название компании или ссылку на 2ГИС.<br><em>Прототип будет через 2 дня.</em></h2>
+      <div class="hero__row"><a class="btn btn--main" href="#svyaz" data-tg>Написать в Telegram</a><a class="btn btn--line" href="#svyaz">Написать в MAX</a></div>
+      <p class="contact__small">Работаем как ИП, по договору · <span data-phone></span></p>
+    </section>
+  </main>
+
+  <footer class="foot"><span>© 2026 Прототип</span><span>3D-модель в демо «Мастерская на дому»: nikita.bulgakov, CC BY 4.0</span></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
