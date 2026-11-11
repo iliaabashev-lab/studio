@@ -90,13 +90,34 @@ if (fine) {
     m.x = e.clientX; m.y = e.clientY; cur.classList.add('is-on');
     if (reduced) { r.x = m.x; r.y = m.y; }
   }, { passive: true });
-  document.addEventListener('mouseout', (e) => { if (!e.relatedTarget) cur.classList.remove('is-on', 'is-down'); }); // ушёл с окна или в iframe с живым сайтом
+  // ушёл с окна или навёл на живой сайт в рамке (iframe): там работает родной курсор того сайта, наш прячем
+  const off = () => cur.classList.remove('is-on', 'is-down');
+  document.addEventListener('mouseout', (e) => { if (!e.relatedTarget || e.relatedTarget.tagName === 'IFRAME') off(); });
+  $$('iframe').forEach((f) => f.addEventListener('pointerenter', off));
+  addEventListener('blur', off); // клик внутри живого сайта уводит фокус в iframe
+  // Браузер не всегда сообщает, что мышь ушла в iframe (сайт с другого домена): события просто перестают приходить.
+  // Поэтому, если движение оборвалось, а по ходу движения дальше лежит iframe, считаем, что мышь ушла в него.
+  let prev = null, idle = 0;
+  addEventListener('pointermove', (e) => {
+    const p0 = prev; prev = { x: e.clientX, y: e.clientY };
+    clearTimeout(idle);
+    if (!p0) return;
+    const dx = e.clientX - p0.x, dy = e.clientY - p0.y;
+    idle = setTimeout(() => {
+      const len = Math.max(1, Math.hypot(dx, dy)), reach = Math.min(90, Math.max(24, len * 2));
+      for (let d = 8; d <= reach; d += 8) { // проверяем точки по ходу движения
+        const hit = document.elementFromPoint(e.clientX + dx / len * d, e.clientY + dy / len * d);
+        if (hit && hit.tagName === 'IFRAME') { off(); break; }
+      }
+    }, 60);
+  }, { passive: true });
   addEventListener('pointerdown', () => cur.classList.add('is-down'));
   const up = () => cur.classList.remove('is-down');
   ['pointerup', 'pointercancel', 'blur', 'dragend'].forEach((n) => addEventListener(n, up));
   const LABELS = [['.dial__stage canvas', 'Тянуть'], ['.acc__head', 'Кейс'], ['.acc__shot, .dial__fallback', 'Кейс']];
   document.addEventListener('pointerover', (e) => {
     const el = e.target;
+    if (el.tagName === 'IFRAME') { off(); return; }
     const hit = LABELS.find(([sel]) => el.closest(sel));
     const link = el.closest('a, button, [role="tab"], label');
     cur.classList.toggle('is-label', !!hit);
