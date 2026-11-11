@@ -4,49 +4,67 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Кейс — Прототип</title>
-  <meta name="theme-color" content="#151717">
+  <meta name="theme-color" content="#E8EBEE">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Playfair+Display:ital,wght@1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap">
   <link rel="stylesheet" href="./style.css">
   <script>document.documentElement.classList.replace('no-js','js')</script>
 </head>
 <body class="is-case">
-  <div class="wipe is-cover" aria-hidden="true"></div>
   <header class="top">
     <a class="logo" href="./" data-wipe>Прототип<sup>студия</sup></a>
     <a class="menu-btn" href="./#raboty" data-wipe><span class="menu-btn__label">Все работы</span></a>
   </header>
 
-  <!-- страница кейса (по brandonyasin.com): крупный заголовок, слева липкая колонка фактов, справа живой сайт -->
   <main class="case">
+    <!-- шапка кейса (по brandonyasin.com): огромное название, курсивом ниша, ряд фактов -->
     <section class="case__head">
       <p class="case__kind"></p>
       <h1 class="case__title"></h1>
       <p class="case__niche"></p>
+      <dl class="case__facts">
+        <div><dt>Тип</dt><dd data-f="kind"></dd></div>
+        <div><dt>Срок</dt><dd data-f="time"></dd></div>
+        <div><dt>Технологии</dt><dd data-f="stack"></dd></div>
+        <div><dt>Год</dt><dd data-f="year"></dd></div>
+      </dl>
     </section>
-    <div class="case__grid">
-      <aside class="case__facts">
-        <dl>
-          <dt>Ниша</dt><dd data-f="niche"></dd>
-          <dt>Тип</dt><dd data-f="kind"></dd>
-          <dt>Срок</dt><dd>2–3 дня</dd>
-          <dt>Сайт</dt><dd><a data-f="url" target="_blank" rel="noopener">открыть в новой вкладке</a></dd>
-        </dl>
-      </aside>
-      <div class="case__body">
-        <h2>Задача</h2><p data-f="task"></p>
-        <div class="case__screens">
-          <div class="desk"><div class="desk__bar"><i></i><i></i><i></i></div><iframe title="Сайт на компьютере" loading="lazy"></iframe></div>
-          <div class="phone phone--case"><div class="phone__screen"><iframe title="Сайт на телефоне" loading="lazy"></iframe></div><span class="phone__island"></span></div>
+
+    <!-- живой сайт во всю ширину: можно листать прямо здесь, переключить на телефон, открыть в новой вкладке -->
+    <section class="live" aria-label="Живой сайт">
+      <div class="live__bar">
+        <div class="seg" role="tablist" aria-label="Устройство">
+          <button type="button" role="tab" aria-selected="true" data-mode="desk">Компьютер</button>
+          <button type="button" role="tab" aria-selected="false" data-mode="phone">Телефон</button>
         </div>
-        <h2>Что сделали</h2><ul class="case__did"></ul>
-        <h2>Что получает владелец</h2><p data-f="result"></p>
+        <p class="live__hint">Сайт живой — листайте и нажимайте прямо здесь</p>
+        <a class="btn btn--main live__open" data-f="url" target="_blank" rel="noopener">Открыть сайт ↗</a>
       </div>
-    </div>
+      <div class="live__stage" data-mode="desk">
+        <div class="browser"><div class="browser__bar"><i></i><i></i><i></i><span class="browser__url"></span></div><div class="browser__view"><iframe title="Сайт на компьютере"></iframe></div></div>
+        <div class="phone phone--big"><div class="phone__screen"><iframe title="Сайт на телефоне"></iframe></div><span class="phone__island"></span></div>
+      </div>
+    </section>
+
+    <section class="story">
+      <div class="story__col"><h2>Задача</h2><p data-f="task"></p></div>
+      <div class="story__col"><h2>Решение</h2><p data-f="solution"></p></div>
+    </section>
+
+    <section class="feats" aria-labelledby="feats-t">
+      <h2 id="feats-t">Что внутри</h2>
+      <ol class="feats__list"></ol>
+    </section>
+
+    <section class="result" aria-labelledby="res-t">
+      <h2 id="res-t" class="visually-hidden">Результат</h2>
+      <p class="result__text" data-f="result"></p>
+    </section>
+
     <a class="case__next" data-wipe href="#"><span>Следующая работа</span><b></b></a>
   </main>
-  <footer class="foot"><span>© 2026 Прототип</span><span>Работы на сайте — демо и концепты</span></footer>
+  <footer class="foot"><span>© 2026 Прототип</span><span data-credit></span></footer>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
-  <script type="module" src="./app.js"></script>
+  <script type="module" src="./app.js?v=4"></script>
 </body>
 </html>

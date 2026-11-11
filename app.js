@@ -1,4 +1,5 @@
-import { WORKS, STUDIO } from './data.js';
+import { WORKS, STUDIO } from './data.js?v=3';
+import { mountDial } from './dial.js?v=4';
 
 const gsap = window.gsap;
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -12,24 +13,23 @@ function fit(frame, w) {
   const box = frame.parentElement;
   const k = box.clientWidth / w;
   frame.style.transform = `scale(${k})`;
+  frame.style.height = `${Math.ceil(box.clientHeight / k)}px`; // по высоте ровно на рамку — внутри листается сам сайт
 }
 const fitters = [];
 addEventListener('resize', () => fitters.forEach((f) => f()));
 
-/* ---------- радужные переходы между страницами ---------- */
-const wipe = $('.wipe');
+/* ---------- переход между страницами: короткое затухание (без шторок) ---------- */
 function go(href) {
-  if (reduced || !gsap) { location.href = href; return; }
-  gsap.fromTo(wipe, { yPercent: 101 }, { yPercent: 0, duration: 0.55, ease: 'power3.inOut', onComplete: () => { location.href = href; } });
+  if (reduced) { location.href = href; return; }
+  document.body.classList.add('is-leaving');
+  setTimeout(() => { location.href = href; }, 320);
 }
 document.addEventListener('click', (e) => {
-  const a = e.target.closest('a[data-wipe], a.acc__head, a.acc__go');
+  const a = e.target.closest('a[data-wipe], a.acc__head, a.acc__go, a.dial__go');
   if (!a || e.metaKey || e.ctrlKey || a.target === '_blank') return;
   e.preventDefault(); go(a.getAttribute('href'));
 });
-addEventListener('pageshow', () => { if (gsap) gsap.set(wipe, { yPercent: 101 }); });
-if (isCase && gsap && !reduced) gsap.fromTo(wipe, { yPercent: 0 }, { yPercent: -101, duration: 0.7, ease: 'power3.inOut', delay: 0.05, onComplete: () => wipe.classList.remove('is-cover') });
-else wipe.classList.remove('is-cover');
+addEventListener('pageshow', () => document.body.classList.remove('is-leaving'));
 
 /* ---------- меню ---------- */
 const menuBtn = $('button.menu-btn');
@@ -91,14 +91,13 @@ if (!isCase) {
       if (p.active < 0.02) { p.x = w * (0.62 + 0.22 * Math.sin(t * 0.7)); p.y = h * (0.42 + 0.2 * Math.sin(t * 1.1)); } // сам «дышит», пока мышь не двигается
       p.active *= 0.985;
       g.globalCompositeOperation = 'source-over';
-      g.fillStyle = 'rgba(21,23,23,0.07)'; g.fillRect(0, 0, w, h);
-      g.globalCompositeOperation = 'lighter';
+      g.fillStyle = 'rgba(232,235,238,0.06)'; g.fillRect(0, 0, w, h);
       const steps = Math.max(1, Math.min(12, Math.hypot(p.x - p.px, p.y - p.py) / 8));
       for (let i = 0; i < steps; i++) {
         const x = p.px + (p.x - p.px) * (i / steps), y = p.py + (p.y - p.py) * (i / steps);
         const hue = (t * 40 + x * 0.15) % 360, r = Math.min(w, h) * 0.12;
         const grd = g.createRadialGradient(x, y, 0, x, y, r);
-        grd.addColorStop(0, `hsla(${hue}, 90%, 62%, 0.16)`); grd.addColorStop(1, `hsla(${hue}, 90%, 62%, 0)`);
+        grd.addColorStop(0, `hsla(${hue}, 85%, 60%, 0.12)`); grd.addColorStop(1, `hsla(${hue}, 85%, 60%, 0)`);
         g.fillStyle = grd; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
       }
       p.px = p.x; p.py = p.y;
@@ -106,21 +105,47 @@ if (!isCase) {
     loop();
   }
 
+  /* ---------- карточка работ: прокрутка листает кадры ---------- */
+  const SL = [
+    { img: './img/tehnika.jpg', id: 'tehnika' }, { img: './img/tehnika-xray.jpg', id: 'tehnika', note: 'разборка на прокрутке' },
+    { img: './img/gipu.jpg', id: 'gipu' }, { img: './img/rkompas.jpg', id: 'rkompas' },
+  ].map((x) => ({ ...x, w: WORKS.find((w) => w.id === x.id) }));
+  const dialRoot = $('.dial');
+  const names = $('.dial__names');
+  names.innerHTML = SL.map((x, i) => `<li><button type="button" data-i="${i}">${x.w.title}${x.note ? ` · ${x.note}` : ''}</button></li>`).join('');
+  const setMeta = (i) => {
+    const x = SL[i];
+    $('.dial__count').textContent = `${String(i + 1).padStart(2, '0')} / ${String(SL.length).padStart(2, '0')}`;
+    $('.dial__name').textContent = x.w.title; $('.dial__niche').textContent = x.note ? `${x.w.niche} — ${x.note}` : x.w.niche;
+    $('.dial__go').href = `./case.html?id=${x.w.id}`;
+    $('.dial__fallback').src = x.img;
+    $$('button', names).forEach((b, k) => b.classList.toggle('is-on', k === i));
+  };
+  setMeta(0);
+  const dial = mountDial(dialRoot, SL, { reduced, onChange: setMeta });
+  names.addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return;
+    const i = +b.dataset.i; const top = dialRoot.offsetTop + (i + 0.5) / SL.length * (dialRoot.offsetHeight - innerHeight); scrollTo({ top, behavior: reduced ? 'auto' : 'smooth' }); });
+  const onScroll = () => {
+    const r = dialRoot.getBoundingClientRect(); const range = dialRoot.offsetHeight - innerHeight;
+    const p = Math.min(0.999, Math.max(0, -r.top / range));
+    const i = Math.floor(p * SL.length);
+    if (i !== dial.index) dial.go(i, i > dial.index ? 1 : -1);
+  };
+  addEventListener('scroll', onScroll, { passive: true });
+
   /* ---------- сетка-аккордеон работ ---------- */
   const acc = $('.acc');
   acc.innerHTML = WORKS.map((w, i) => `
     <li class="acc__item" style="--h:${w.hue}">
       <a class="acc__head" href="./case.html?id=${w.id}"><span class="acc__n">${String(i + 1).padStart(2, '0')}</span><span class="acc__t">${w.title}</span><span class="acc__niche">${w.niche}</span><span class="acc__kind">${w.kind}</span></a>
       <div class="acc__body"><div><div class="acc__inner"><span></span>
-        <div class="acc__shot"><iframe title="${w.title}" tabindex="-1" data-src="${w.url}"></iframe></div>
+        <div class="acc__shot"><img src="./img/${w.id}.jpg" alt="${w.title}: главный экран" loading="lazy"></div>
         <div class="acc__side"><p>${w.task}</p><a class="btn btn--main acc__go" href="./case.html?id=${w.id}">Открыть кейс</a></div>
       </div></div></div>
     </li>`).join('');
   const items = $$('.acc__item');
   const open = (li) => {
     items.forEach((x) => x.classList.toggle('is-open', x === li));
-    const f = $('iframe', li);
-    if (f && !f.src) { f.src = f.dataset.src; const fx = () => fit(f, 1280); fitters.push(fx); requestAnimationFrame(fx); }
   };
   items.forEach((li) => {
     if (fine) li.addEventListener('mouseenter', () => open(li));
@@ -132,8 +157,8 @@ if (!isCase) {
   /* ---------- сайты на экране телефона ---------- */
   const tabs = $('.phone-tabs');
   const pf = $('.phone__screen iframe');
-  const phoneWorks = WORKS.filter((w) => !['gipu'].includes(w.id));
-  tabs.innerHTML = phoneWorks.map((w, i) => `<button type="button" role="tab" aria-selected="${i === 1}" data-id="${w.id}">${w.title}</button>`).join('');
+  const phoneWorks = WORKS;
+  tabs.innerHTML = phoneWorks.map((w, i) => `<button type="button" role="tab" aria-selected="${i === 0}" data-id="${w.id}">${w.title}</button>`).join('');
   const show = (id) => {
     const w = WORKS.find((x) => x.id === id);
     $$('button', tabs).forEach((b) => b.setAttribute('aria-selected', String(b.dataset.id === id)));
@@ -141,7 +166,7 @@ if (!isCase) {
   };
   tabs.addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) show(b.dataset.id); });
   const pfit = () => fit(pf, 390); fitters.push(pfit);
-  new IntersectionObserver(([e], ob) => { if (e.isIntersecting) { show(phoneWorks[1].id); pfit(); ob.disconnect(); } }, { rootMargin: '300px' }).observe(pf);
+  new IntersectionObserver(([e], ob) => { if (e.isIntersecting) { show(phoneWorks[0].id); pfit(); ob.disconnect(); } }, { rootMargin: '300px' }).observe(pf);
 } else {
   /* ---------- страница кейса ---------- */
   const id = new URLSearchParams(location.search).get('id') || WORKS[0].id;
@@ -149,13 +174,22 @@ if (!isCase) {
   const w = WORKS[i];
   document.title = `${w.title} — кейс студии ${STUDIO.name}`;
   $('.case__title').textContent = w.title;
-  $('.case__kind').textContent = w.kind;
+  $('.case__kind').textContent = `${w.kind} · ${w.year}`;
   $('.case__niche').textContent = w.niche;
   $$('[data-f]').forEach((el) => { const k = el.dataset.f; if (k === 'url') el.href = w.url; else el.textContent = w[k]; });
-  $('.case__did').innerHTML = w.did.map((d) => `<li>${d}</li>`).join('');
-  const [desk, mob] = $$('.case__screens iframe');
-  desk.src = w.url; mob.src = w.url;
-  const fx = () => { fit(desk, 1280); fit(mob, 390); }; fitters.push(fx); requestAnimationFrame(fx);
+  $('.browser__url').textContent = w.url.replace('https://', '');
+  $('.feats__list').innerHTML = w.features.map(([t, d]) => `<li><b>${t}</b><span>${d}</span></li>`).join('');
+  if (w.id === 'tehnika') $('[data-credit]').textContent = '3D-модель стиральной машины: nikita.bulgakov, CC BY 4.0';
+  const desk = $('.browser iframe'), mob = $('.phone--big iframe'), stage = $('.live__stage');
+  desk.src = w.url;
+  const fx = () => { fit(desk, 1440); if (mob.src) fit(mob, 390); }; fitters.push(fx); requestAnimationFrame(fx);
+  $('.seg').addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    $$('.seg button').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+    stage.dataset.mode = b.dataset.mode;
+    if (b.dataset.mode === 'phone' && !mob.src) mob.src = w.url;
+    requestAnimationFrame(fx);
+  });
   const nx = WORKS[(i + 1) % WORKS.length];
   const next = $('.case__next'); next.href = `./case.html?id=${nx.id}`; $('b', next).textContent = nx.title;
   if (gsap && !reduced) gsap.from('.case__title', { yPercent: 40, opacity: 0, duration: 0.9, ease: 'power3.out', delay: 0.35 });
