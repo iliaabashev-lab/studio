@@ -42,7 +42,11 @@ if (menuBtn && menu) {
 }
 
 /* ---------- контакты ---------- */
-$$('[data-phone]').forEach((el) => { el.textContent = STUDIO.phone; });
+// контакты: пока владелец не дал ник и телефон, кнопки-заглушки не показываем
+const real = (v) => v && !v.includes('[');
+$$('[data-phone]').forEach((el) => { if (real(STUDIO.phone)) el.textContent = STUDIO.phone; else el.previousSibling && (el.previousSibling.textContent = el.previousSibling.textContent.replace(/ · $/, '')); });
+$$('[data-tg]').forEach((el) => { if (real(STUDIO.tg)) { el.href = 'https://t.me/' + STUDIO.tg.replace('@', ''); el.target = '_blank'; } });
+if (!real(STUDIO.tg)) { const row = $('.contact .hero__row'); if (row) row.outerHTML = '<p class="contact__reply">Ответьте в том же чате, откуда пришла ссылка на этот сайт.</p>'; }
 
 /* ---------- синее пятно за курсором: на всю страницу, позади текста ---------- */
 if (!reduced) {
