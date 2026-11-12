@@ -1,4 +1,4 @@
-import { WORKS, STUDIO } from './data.js?v=7';
+import { WORKS, STUDIO } from './data.js?v=8';
 import { mountDial } from './dial.js?v=7';
 
 const gsap = window.gsap;
@@ -44,8 +44,16 @@ if (menuBtn && menu) {
 /* ---------- контакты ---------- */
 // контакты: пока владелец не дал ник и телефон, кнопки-заглушки не показываем
 const real = (v) => v && !v.includes('[');
-$$('[data-phone]').forEach((el) => { if (real(STUDIO.phone)) el.textContent = STUDIO.phone; else el.previousSibling && (el.previousSibling.textContent = el.previousSibling.textContent.replace(/ · $/, '')); });
+$$('[data-phone]').forEach((el) => { if (real(STUDIO.phone)) el.textContent = STUDIO.phone; else el.previousSibling && (el.previousSibling.textContent = el.previousSibling.textContent.replace(/ · (MAX: )?$/, '')); });
 $$('[data-tg]').forEach((el) => { if (real(STUDIO.tg)) { el.href = 'https://t.me/' + STUDIO.tg.replace('@', ''); el.target = '_blank'; } });
+$$('[data-max]').forEach((el) => {
+  if (!real(STUDIO.phone)) { el.hidden = true; return; }
+  el.addEventListener('click', async (e) => {
+    e.preventDefault();
+    try { await navigator.clipboard.writeText(STUDIO.phone.replace(/[^+\d]/g, '')); el.textContent = 'Номер скопирован: найдите его в MAX'; }
+    catch (err) { el.textContent = 'Номер в MAX: ' + STUDIO.phone; }
+  });
+});
 if (!real(STUDIO.tg)) { const row = $('.contact .hero__row'); if (row) row.outerHTML = '<p class="contact__reply">Ответьте в том же чате, откуда пришла ссылка на этот сайт.</p>'; }
 
 /* ---------- синее пятно за курсором: на всю страницу, позади текста ---------- */
