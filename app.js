@@ -1,4 +1,4 @@
-import { WORKS, STUDIO } from './data.js?v=8';
+import { WORKS, STUDIO } from './data.js?v=9';
 import { mountDial } from './dial.js?v=7';
 
 const gsap = window.gsap;
@@ -176,6 +176,7 @@ if (!isCase) {
   /* ---------- карточка работ: прокрутка листает кадры ---------- */
   const SL = [
     { img: './img/tehnika.jpg', id: 'tehnika' },
+    { img: './img/tara.jpg', id: 'tara' }, { img: './img/syrgych.jpg', id: 'syrgych' },
     { img: './img/gipu.jpg', id: 'gipu' }, { img: './img/rkompas.jpg', id: 'rkompas' },
   ].map((x) => ({ ...x, w: WORKS.find((w) => w.id === x.id) }));
   const dialRoot = $('.dial');
